@@ -2,15 +2,20 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
+use Tymon\JWTAuth\Contracts\JWTSubject; // Upewnij się, że ten namespace jest dodany
 
-class User extends Authenticatable
+class User extends Authenticatable implements JWTSubject // Upewnij się, że implementujesz JWTSubject
 {
+
+    /**
+ * @method string createToken(string $name, array $abilities = [])
+ */
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasApiTokens ;
 
     /**
      * The attributes that are mass assignable.
@@ -32,6 +37,15 @@ class User extends Authenticatable
         'password',
         'remember_token',
     ];
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    public function getJWTCustomClaims(): array
+    {
+        return [];
+    }
 
     /**
      * Get the attributes that should be cast.
