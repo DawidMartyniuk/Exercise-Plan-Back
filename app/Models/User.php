@@ -37,6 +37,9 @@ class User extends Authenticatable implements JWTSubject // Upewnij się, że im
         'password',
         'remember_token',
     ];
+    public function exercises(){
+        return $this->HasMay(ExerciseTable::class);
+    }
     public function getJWTIdentifier()
     {
         return $this->getKey();

@@ -10,5 +10,6 @@ Route::prefix('api')->group(function () {
 
     Route::post('/login', [AuthController::class, 'login']);
     
-    Route::middleware('jwt.auth')->post('/logout', [AuthController::class, 'logout']);
+    Route::middleware('jwt.auth')->post('/logout', [
+        AuthController::class, 'logout']);
 });
