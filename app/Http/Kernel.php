@@ -20,6 +20,7 @@ class Kernel extends HttpKernel
         \Illuminate\Http\Middleware\ValidatePostSize::class,
       //  \App\Http\Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
+        \Illuminate\Http\Middleware\HandleCors::class,
     ];
 
     /**
@@ -38,7 +39,7 @@ class Kernel extends HttpKernel
         ],
 
         'api' => [
-            \Tymon\JWTAuth\Http\Middleware\Authenticate::class, // Middleware do autoryzacji JWT
+            //\Tymon\JWTAuth\Http\Middleware\Authenticate::class, // Middleware do autoryzacji JWT
             'throttle:api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
@@ -62,5 +63,6 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'jwt.auth' => \Tymon\JWTAuth\Http\Middleware\Authenticate::class, // Middleware dla JWT
+        
     ];
 }

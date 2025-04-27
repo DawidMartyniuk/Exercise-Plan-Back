@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('exercise_table', function (Blueprint $table) {
             $table->id();
-            $table->string('exercise_name');
             $table->unsignedBigInteger('user_id'); // Dodajesz user_id!
             $table->string('exercise_table');
             $table->timestamps();

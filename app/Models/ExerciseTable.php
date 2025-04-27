@@ -9,6 +9,11 @@ class ExerciseTable extends Model
 {
     protected $table = 'exercise_table';
 
+    protected $fillable = [
+        'user_id',
+        'exercise_table',
+    ];
+
     // Exercise należy do jednego usera
     public function user(): BelongsTo
     {
