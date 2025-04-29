@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\ExerciseRow;
 
 class ExerciseTable extends Model
 {
@@ -14,9 +16,13 @@ class ExerciseTable extends Model
         'exercise_table',
     ];
 
-    // Exercise należy do jednego usera
-    public function user(): BelongsTo
+    // // Exercise należy do jednego usera
+    // public function user(): BelongsTo
+    // {
+    //     return $this->belongsTo(User::class);
+    // }
+      public function rows(): HasMany
     {
-        return $this->belongsTo(User::class);
+        return $this->hasMany(ExerciseRow::class, 'exercise_id');
     }
 }

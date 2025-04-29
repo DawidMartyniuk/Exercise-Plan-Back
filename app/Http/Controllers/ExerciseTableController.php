@@ -25,26 +25,45 @@ class ExerciseTableController extends Controller
      * Zapisz nowe dane exercise_table dla zalogowanego użytkownika.
      */
     public function store(Request $request)
-    {
-        $user = Auth::user();
-    
-        if (!$user) {
-            return response()->json(['message' => 'Użytkownik nie jest zalogowany.'], 401);
+        {
+            $user = Auth::user();
+
+            if (!$user) {
+                return response()->json(['message' => 'Użytkownik nie jest zalogowany.'], 401);
+            }
+
+            // Walidacja danych wejściowych
+            $request->validate([
+                'exercises' => 'required|array',
+                'exercises.*.exercise_table' => 'required|string',
+                'exercises.*.rows' => 'required|array',
+                'exercises.*.rows.*.exercise_name' => 'required|string',
+                'exercises.*.rows.*.notes' => 'nullable|string',
+                'exercises.*.rows.*.colStep' => 'required|integer',
+                'exercises.*.rows.*.colKg' => 'required|integer',
+                'exercises.*.rows.*.colRep' => 'required|integer',
+            ]);
+
+            $savedExercises = [];
+
+            foreach ($request->exercises as $exerciseData) {
+                $exercise = ExerciseTable::create([
+                    'user_id' => $user->id,
+                    'exercise_table' => $exerciseData['exercise_table'],
+                ]);
+
+                foreach ($exerciseData['rows'] as $row) {
+                    $exercise->rows()->create($row);
+                }
+
+                $savedExercises[] = $exercise->load('rows');
+            }
+
+            return response()->json([
+                'message' => 'Ćwiczenia zostały zapisane.',
+                'exercises' => $savedExercises,
+            ], 201);
         }
-    
-        // Walidacja danych wejściowych
-        $request->validate([
-            'exercise_table' => 'required|string',
-        ]);
-    
-        // Zapisz dane do bazy
-        $exercise = ExerciseTable::create([
-            'user_id' => $user->id,
-            'exercise_table' => $request->exercise_table,
-        ]);
-    
-        return response()->json(['message' => 'Ćwiczenie zostało zapisane.', 'exercise' => $exercise], 201);
-    }
     
 
     /**
