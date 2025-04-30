@@ -39,24 +39,39 @@ class ExerciseTableController extends Controller
                 'exercises.*.rows' => 'required|array',
                 'exercises.*.rows.*.exercise_name' => 'required|string',
                 'exercises.*.rows.*.notes' => 'nullable|string',
-                'exercises.*.rows.*.colStep' => 'required|integer',
-                'exercises.*.rows.*.colKg' => 'required|integer',
-                'exercises.*.rows.*.colRep' => 'required|integer',
+                'exercises.*.rows.*.data' => 'required|array',
+                'exercises.*.rows.*.data.*.colStep' => 'required|integer',
+                'exercises.*.rows.*.data.*.colKg' => 'required|integer',
+                'exercises.*.rows.*.data.*.colRep' => 'required|integer',
             ]);
 
             $savedExercises = [];
 
             foreach ($request->exercises as $exerciseData) {
+                 // 1. Tworzymy exercise_table
                 $exercise = ExerciseTable::create([
                     'user_id' => $user->id,
                     'exercise_table' => $exerciseData['exercise_table'],
                 ]);
 
-                foreach ($exerciseData['rows'] as $row) {
-                    $exercise->rows()->create($row);
+                // 2. Tworzymy exercise_rows_data
+                foreach($exerciseData['rows'] as $groupedRow){
+                    $rowData = $exercise->rowsData()->create([
+                        'exercise_name' => $groupedRow['exercise_name'],
+                        'notes' => $groupedRow['notes'] ??  null,
+                    ]);
+
+                    // 3. Tworzymy exercise_rows
+                    foreach ($groupedRow['data'] as $row) {
+                        $rowData->rows()->create([
+                            'colStep'=> $row['colStep'],
+                            'colKg' => $row['colKg'],
+                            'colRep' => $row['colRep'],
+                        ]);
+                    }
                 }
 
-                $savedExercises[] = $exercise->load('rows');
+                $savedExercises[] = $exercise->load('rowsData.rows');
             }
 
             return response()->json([

@@ -21,7 +21,17 @@ class ExerciseTable extends Model
     // {
     //     return $this->belongsTo(User::class);
     // }
-      public function rows(): HasMany
+    // public function rowData(): BelongsTo
+    // {
+    //     return $this->belongsTo(ExerciseRowData::class, 'row_data_id');
+    // }
+    public function rowsData(): HasMany
+    {
+        return $this->hasMany(ExerciseRowData::class, 'exercise_id');
+    }
+
+    // Relacja do exercise_rows
+    public function rows(): HasMany
     {
         return $this->hasMany(ExerciseRow::class, 'exercise_id');
     }
