@@ -5,27 +5,49 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\ExerciseTable;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class ExerciseTableController extends Controller
 {
     /**
      * Pobierz wszystkie dane exercise_table dla zalogowanego użytkownika.
-     */
-    public function index()
-    {
-        $user = Auth::user();
+     */public function index()
+{
+    $user = Auth::user();
+        
+    $exercises = ExerciseTable::where('user_id', $user->id)->get();
 
-        // Pobierz dane z tabeli exercise_table dla zalogowanego użytkownika
-        $exercises = ExerciseTable::where('user_id', $user->id)->get();
+    $formattedExercises = $exercises->map(function ($exercise) {
+        return [
+            'id' => $exercise->id,
+            'exercise_table' => $exercise->exercise_table,
+            'rows' => $exercise->rowsData->map(function($row){
+                return [
+                    'exercise_name' => $row->exercise_name,
+                    'notes' => $row->notes,
+                    'data' => $row->rows->map(function($dataRow){
+                        return [
+                            'colStep' => $dataRow->colStep,
+                            'colKg' => $dataRow->colKg,
+                            'colRep' => $dataRow->colRep,
+                        ];
+                    }),
+                ];
+            }),
+        ];
+    });
 
-        return response()->json($exercises);
-    }
+    // 👇 KLUCZOWA ZMIANA
+    Log::info('Zwracane dane:', $formattedExercises->toArray());
 
-    /**
-     * Zapisz nowe dane exercise_table dla zalogowanego użytkownika.
-     */
+    return response()->json($formattedExercises);
+}
+
+
+  
     public function store(Request $request)
-        {
+    {
+        Log::info('Received payload:', $request->all());
             $user = Auth::user();
 
             if (!$user) {
@@ -77,13 +99,11 @@ class ExerciseTableController extends Controller
             return response()->json([
                 'message' => 'Ćwiczenia zostały zapisane.',
                 'exercises' => $savedExercises,
-            ], 201);
+            ], 200);
         }
     
 
-    /**
-     * Usuń dane exercise_table dla zalogowanego użytkownika.
-     */
+   
     public function destroy($id)
     {
         $user = Auth::user();
