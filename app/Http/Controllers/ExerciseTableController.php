@@ -23,6 +23,7 @@ class ExerciseTableController extends Controller
             'exercise_table' => $exercise->exercise_table,
             'rows' => $exercise->rowsData->map(function($row){
                 return [
+                    'exercise_number' => $row->exercise_number,
                     'exercise_name' => $row->exercise_name,
                     'notes' => $row->notes,
                     'data' => $row->rows->map(function($dataRow){
@@ -59,6 +60,7 @@ class ExerciseTableController extends Controller
                 'exercises' => 'required|array',
                 'exercises.*.exercise_table' => 'required|string',
                 'exercises.*.rows' => 'required|array',
+                'exercises.*.rows.*.exercise_number' => 'required|integer',
                 'exercises.*.rows.*.exercise_name' => 'required|string',
                 'exercises.*.rows.*.notes' => 'nullable|string',
                 'exercises.*.rows.*.data' => 'required|array',
@@ -79,6 +81,8 @@ class ExerciseTableController extends Controller
                 // 2. Tworzymy exercise_rows_data
                 foreach($exerciseData['rows'] as $groupedRow){
                     $rowData = $exercise->rowsData()->create([
+                        'exercise_id' => $exercise->id,
+                        'exercise_number' => $groupedRow['exercise_number'],
                         'exercise_name' => $groupedRow['exercise_name'],
                         'notes' => $groupedRow['notes'] ??  null,
                     ]);

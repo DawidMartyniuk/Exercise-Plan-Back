@@ -12,6 +12,7 @@ class ExerciseRowData extends Model
 
     protected $fillable = [
         'exercise_id',
+        'exercise_number',
         'exercise_name',
         'notes',
     ];
