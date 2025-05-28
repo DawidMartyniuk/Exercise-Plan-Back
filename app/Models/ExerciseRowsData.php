@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class ExerciseRowData extends Model
+class ExerciseRowsData extends Model
 {
     protected $table = 'exercise_rows_data';
 
@@ -25,7 +25,7 @@ class ExerciseRowData extends Model
     // Relacja do pojedynczych serii (rows)
     public function rows(): HasMany
     {
-        return $this->hasMany(ExerciseRow::class, 'row_data_id');
+        return $this->hasMany(ExerciseRows::class, 'row_data_id');
     }
 }
 

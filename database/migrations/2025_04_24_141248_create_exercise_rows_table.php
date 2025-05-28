@@ -7,8 +7,9 @@ return new class extends Migration
 {
     public function up(): void
     {
-        if (!Schema::hasTable('exercise_rows')) {
+       // if (!Schema::hasTable('exercise_rows')) {
             Schema::create('exercise_rows', function (Blueprint $table) {
+                $table->engine = 'InnoDB'; 
                 $table->id();
                 $table->unsignedBigInteger('row_data_id'); 
                 $table->integer('colStep');
@@ -18,8 +19,9 @@ return new class extends Migration
     
                 $table->foreign('row_data_id')->references('id')->on('exercise_rows_data')->onDelete('cascade');
             });
-        }
+      //  }
     }
+//
 
     public function down(): void
     {

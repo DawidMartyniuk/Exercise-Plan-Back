@@ -55,7 +55,6 @@ class ExerciseTableController extends Controller
                 return response()->json(['message' => 'Użytkownik nie jest zalogowany.'], 401);
             }
 
-            // Walidacja danych wejściowych
             $request->validate([
                 'exercises' => 'required|array',
                 'exercises.*.exercise_table' => 'required|string',
@@ -72,13 +71,13 @@ class ExerciseTableController extends Controller
             $savedExercises = [];
 
             foreach ($request->exercises as $exerciseData) {
-                 // 1. Tworzymy exercise_table
+           
                 $exercise = ExerciseTable::create([
                     'user_id' => $user->id,
                     'exercise_table' => $exerciseData['exercise_table'],
                 ]);
 
-                // 2. Tworzymy exercise_rows_data
+           
                 foreach($exerciseData['rows'] as $groupedRow){
                     $rowData = $exercise->rowsData()->create([
                         'exercise_id' => $exercise->id,
@@ -87,7 +86,7 @@ class ExerciseTableController extends Controller
                         'notes' => $groupedRow['notes'] ??  null,
                     ]);
 
-                    // 3. Tworzymy exercise_rows
+                
                     foreach ($groupedRow['data'] as $row) {
                         $rowData->rows()->create([
                             'colStep'=> $row['colStep'],

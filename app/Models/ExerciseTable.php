@@ -27,12 +27,12 @@ class ExerciseTable extends Model
     // }
     public function rowsData(): HasMany
     {
-        return $this->hasMany(ExerciseRowData::class, 'exercise_id');
+        return $this->hasMany(ExerciseRowsData::class, 'exercise_id');
     }
 
     // Relacja do exercise_rows
     public function rows(): HasMany
     {
-        return $this->hasMany(ExerciseRow::class, 'exercise_id');
+        return $this->hasMany(ExerciseRows::class, 'exercise_id');
     }
 }

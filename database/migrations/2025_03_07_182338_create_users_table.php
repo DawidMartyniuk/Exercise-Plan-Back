@@ -8,7 +8,9 @@ class CreateUsersTable extends Migration
 {
     public function up()
     {
+        if(!Schema::hasTable('users')){
         Schema::create('users', function (Blueprint $table) {
+            $table->engine = 'InnoDB'; 
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
@@ -16,6 +18,8 @@ class CreateUsersTable extends Migration
             $table->rememberToken();
             $table->timestamps();
         });
+        }
+        
     }
 
     public function down()

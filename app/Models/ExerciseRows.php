@@ -5,7 +5,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class ExerciseRow extends Model
+class ExerciseRows extends Model
 {
     protected $table = 'exercise_rows';
 
@@ -15,9 +15,8 @@ class ExerciseRow extends Model
         'colKg',
         'colRep',
     ];
-
-    public function rows(): HasMany
+    public function exerciseData(): BelongsTo
     {
-        return $this->hasMany(ExerciseRow::class, 'row_data_id');
+        return $this->belongsTo(ExerciseRowsData::class, 'row_data_id');
     }
 }

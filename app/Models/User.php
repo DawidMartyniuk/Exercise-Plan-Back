@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Models\TrainingSessions;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Laravel\Sanctum\HasApiTokens;
 use Tymon\JWTAuth\Contracts\JWTSubject; // Upewnij się, że ten namespace jest dodany
 
@@ -38,7 +40,12 @@ class User extends Authenticatable implements JWTSubject // Upewnij się, że im
         'remember_token',
     ];
     public function exercises(){
-        return $this->HasMay(ExerciseTable::class);
+
+        return $this->hasMany(ExerciseTable::class);
+    }
+    public function trainingSessions()
+    {
+        return $this->hasMany(TrainingSessions::class);
     }
     public function getJWTIdentifier()
     {

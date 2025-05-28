@@ -13,6 +13,7 @@ return new class extends Migration
     {
         if (!Schema::hasTable('exercise_rows_data')) {
             Schema::create('exercise_rows_data', function (Blueprint $table) {
+                $table->engine = 'InnoDB'; 
                 $table->id();
                 $table->unsignedBigInteger('exercise_id');
                 $table->integer('exercise_number');
