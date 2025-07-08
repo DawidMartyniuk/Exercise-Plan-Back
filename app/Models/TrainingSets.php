@@ -11,8 +11,6 @@ class TrainingSets extends Model
     protected $fillable = [
         'training_exercise_id',
         'colStep',
-        'planned_kg',
-        'planned_reps',
         'actual_kg',
         'actual_reps',
         'completed',

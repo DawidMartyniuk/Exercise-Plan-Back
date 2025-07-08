@@ -65,41 +65,9 @@ class TreiningSesionsController extends Controller
 
         ]);
 
-        $session = TrainingSessions::create($request->all());
-
-        // Assuming you have a method to handle exercises and sets
+        //$session = TrainingSessions::create($request->all());
 
         $savedPlannedExercises = [];
-        // foreach ($request->input('exercises', []) as $exerciseData) {
-        //     $exercise = TrainingExercises::create([
-        //         'training_session_id' => $session->id,
-        //         'exercise_id' => $exerciseData['exercise_id'],
-        //         'notes' => $exerciseData['notes'] ?? null,
-        //     ]);
-
-        //     foreach ($exerciseData['sets'] as $setData) {
-        //         $set = TrainingSets::create([
-        //             'training_exercise_id' => $exercise->id,
-        //             'colStep' => $setData['colStep'],
-        //             'planned_kg' => $setData['planned_kg'] ?? null,
-        //             'planned_reps' => $setData['planned_reps'] ?? null,
-        //             'actual_kg' => $setData['actual_kg'] ?? null,
-        //             'actual_reps' => $setData['actual_reps'] ?? null,
-        //             'completed' => $setData['completed'] ?? false,
-        //             'to_failure' => $setData['to_failure'] ?? false,
-        //         ]);
-        //     }
-        //     $savedPlannedExercises[] = $exercise;
-       // }
-        //foreach($request-> sesions as trainingSessions  )
-        
-            // 'exercises.*.sets' => 'required|array',
-
-            // 'exercises.*.sets.*.actual_kg' => 'nullable|numeric',
-            // 'exercises.*.sets.*.actual_reps' => 'nullable|integer',
-            // 'exercises.*.sets.*.completed' => 'boolean',
-            // 'exercises.*.sets.*.to_failure' => 'boolean',
-
 
         $sesions = TrainingSessions::create([
             "user_id" => $user->id,
@@ -130,8 +98,6 @@ class TreiningSesionsController extends Controller
             }
         }
         $savedPlannedExercises[] = $sesions;
-
-
 
         return response()->json([
             'message' => 'Training session created successfully.',

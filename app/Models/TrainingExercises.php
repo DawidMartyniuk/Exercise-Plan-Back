@@ -14,8 +14,9 @@ class TrainingExercises extends Model
 
     protected $fillable = [
         'training_session_id',
-        'exercise_library_id',
+        'exercise_id', 
         'notes',
+        
     ];
      public function trainingSession()
     {
