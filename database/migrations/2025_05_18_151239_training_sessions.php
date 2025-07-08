@@ -19,6 +19,9 @@ return new class extends Migration
                 $table->timestamp('started_at')->nullable();
                 $table->timestamp('ended_at')->nullable();
                 $table->boolean('completed')->default(true);
+                $table->double('total_weight')->nullable(); // nowe pole
+                $table->text('description')->nullable(); // nowe pole
+                $table->longText('image_base64')->nullable(); // nowe pole
                 $table->timestamps();
 
                 $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

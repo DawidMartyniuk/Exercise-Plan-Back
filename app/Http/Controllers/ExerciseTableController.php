@@ -38,7 +38,7 @@ class ExerciseTableController extends Controller
             ];
         });
 
-        // 👇 KLUCZOWA ZMIANA
+      
         Log::info('Zwracane dane:', $formattedExercises->toArray());
 
         return response()->json($formattedExercises);
@@ -70,7 +70,7 @@ class ExerciseTableController extends Controller
 
         $savedExercises = [];
 
-        foreach ($request->exercises as $exerciseData) {
+        foreach ($request->exercises as $exerciseData) { 
 
             $exercise = ExerciseTable::create([
                 'user_id' => $user->id,

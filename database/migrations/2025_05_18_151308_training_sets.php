@@ -21,6 +21,7 @@ return new class extends Migration
                 $table->integer('actual_kg')->nullable();
                 $table->integer('actual_reps')->nullable();
                 $table->boolean('completed')->default(false);
+                $table->boolean('to_failure')->default(false); 
                 $table->timestamps();
 
                 $table->foreign('training_exercise_id')->references('id')->on('training_exercises')->onDelete('cascade');

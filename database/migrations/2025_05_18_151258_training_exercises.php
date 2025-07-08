@@ -15,7 +15,7 @@ return new class extends Migration
             Schema::create('training_exercises', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('training_session_id');
-                $table->unsignedBigInteger('exercise_library_id'); // z jakiego ćwiczenia
+                $table->unsignedBigInteger('exercise_id'); // z jakiego ćwiczenia
                 $table->string('notes')->nullable(); // z planu
                 $table->timestamps();
 
