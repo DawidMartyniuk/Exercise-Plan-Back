@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ExerciseTableController;
-use App\Http\Controllers\TreiningSesionsController;
+use App\Http\Controllers\TrainingSesionsController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Log;
 
@@ -26,7 +26,7 @@ Route::prefix('api')->middleware('jwt.auth')->group(function () {
 
     Route::post('/logout', [AuthController::class, 'logout']);
 
-    Route::get('/training-sessions', [TreiningSesionsController::class, 'index']);
+    Route::get('/training-sessions', [TrainingSesionsController::class, 'index']);
 
-    Route::post('/training-sessions', [TreiningSesionsController::class, 'store']);
+    Route::post('/training-sessions', [TrainingSesionsController::class, 'store']);
 });

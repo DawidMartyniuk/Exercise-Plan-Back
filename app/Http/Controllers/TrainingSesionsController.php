@@ -9,7 +9,7 @@ use App\Models\TrainingSessions; // Use the correct model name if it exists
 use App\Models\TrainingExercises;
 use App\Models\TrainingSets;
 
-class TreiningSesionsController extends Controller
+class TrainingSesionsController extends Controller
 {
     /**
      * Log the user ID and session data.
@@ -46,7 +46,7 @@ class TreiningSesionsController extends Controller
         $request->validate([
             'exercise_table_id' => 'required|exists:exercise_table,id',
             'started_at' => 'required|date',
-            'ended_at' => 'nullable|date',
+            'duration' => 'nullable',
             'completed' => 'boolean',
             'total_weight' => 'nullable|numeric',
             'description' => 'nullable|string',
@@ -73,7 +73,7 @@ class TreiningSesionsController extends Controller
             "user_id" => $user->id,
             "exercise_table_id" => $request->exercise_table_id,
             "started_at" => $request->started_at,
-            "ended_at" => $request->ended_at,
+            "duration" => $request->duration,
             "completed" => $request->completed,
             "total_weight" => $request->total_weight,
             "description" => $request->description,

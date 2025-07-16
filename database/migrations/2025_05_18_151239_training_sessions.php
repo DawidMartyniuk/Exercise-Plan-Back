@@ -17,11 +17,11 @@ return new class extends Migration
                 $table->unsignedBigInteger('user_id');
                 $table->unsignedBigInteger('exercise_table_id')->nullable();
                 $table->timestamp('started_at')->nullable();
-                $table->timestamp('ended_at')->nullable();
+                $table->timestamp('ended_at')->nullable(); // zamiast tego ile czasu trwał trening
                 $table->boolean('completed')->default(true);
-                $table->double('total_weight')->nullable(); // nowe pole
-                $table->text('description')->nullable(); // nowe pole
-                $table->longText('image_base64')->nullable(); // nowe pole
+                $table->double('total_weight')->nullable(); 
+                $table->text('description')->nullable(); 
+                $table->longText('image_base64')->nullable(); 
                 $table->timestamps();
 
                 $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
