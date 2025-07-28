@@ -37,6 +37,7 @@ class TrainingSesionsController extends Controller
             return [
                 'id' => $exercise->id,
                 'exercise_table_id' => $exercise->exercise_table_id,
+                'exercise_table_name' => $exercise->exerciseTableName,
                 'started_at' => $exercise->started_at,
                 'duration' => $exercise->duration,
                 'completed' => $exercise->completed,
@@ -86,6 +87,7 @@ class TrainingSesionsController extends Controller
         
         $request->validate([
             'exercise_table_id' => 'required|exists:exercise_table,id',
+            'exercise_table_name' => 'required|string|max:255',
             'started_at' => 'required|date',
             'duration' => 'nullable',
             'completed' => 'boolean',
@@ -113,6 +115,7 @@ class TrainingSesionsController extends Controller
         $sesions = TrainingSessions::create([
             "user_id" => $user->id,
             "exercise_table_id" => $request->exercise_table_id,
+            "exerciseTableName" => $exerciseTable->name, 
             "started_at" => $request->started_at,
             "duration" => $request->duration,
             "completed" => $request->completed,

@@ -11,8 +11,9 @@ class TrainingSessions extends Model
       protected $table = 'training_sessions';
 
       protected $fillable = [
-      'user_id',
+        'user_id',
         'exercise_table_id',
+        'exercise_table_name',
         'started_at',
         'duration', 
         'completed',
