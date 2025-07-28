@@ -14,6 +14,7 @@ class TrainingSets extends Model
         'actual_kg',
         'actual_reps',
         'completed',
+        'to_failure',
     ];
 
     public function trainingExercise()

@@ -14,7 +14,7 @@ class TrainingSessions extends Model
       'user_id',
         'exercise_table_id',
         'started_at',
-        'ended_at',
+        'duration', 
         'completed',
         'total_weight',
         'description',
@@ -28,9 +28,13 @@ class TrainingSessions extends Model
     {
             return $this->belongsTo(ExerciseTable::class);
     }
-    public function trainingExercise()
+//     public function trainingExercise()
+//     {
+//             return $this->hasMany(ExerciseTable::class, 'exercise_table_id');
+//     }
+    public function exercises()
     {
-            return $this->hasMany(ExerciseTable::class, 'exercise_table_id');
+        return $this->hasMany(TrainingExercises::class,'training_session_id' );
     }
 
       

@@ -17,6 +17,7 @@ return new class extends Migration
                 $table->unsignedBigInteger('user_id');
                 $table->unsignedBigInteger('exercise_table_id')->nullable();
                 $table->timestamp('started_at')->nullable();
+               $table->integer('duration')->nullable();
                 $table->timestamp('ended_at')->nullable(); // zamiast tego ile czasu trwał trening
                 $table->boolean('completed')->default(true);
                 $table->double('total_weight')->nullable(); 

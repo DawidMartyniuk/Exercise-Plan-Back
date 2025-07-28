@@ -32,5 +32,9 @@ class TrainingExercises extends Model
     {
         return $this->hasMany(TrainingSets::class);
     }
+    public function sets()
+    {
+        return $this->hasMany(TrainingSets::class, 'training_exercise_id');
+    }
 
 }

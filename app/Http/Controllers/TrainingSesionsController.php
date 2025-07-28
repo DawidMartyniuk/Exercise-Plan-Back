@@ -25,10 +25,47 @@ class TrainingSesionsController extends Controller
     }
     public function index()
     {
-        $this->logSessionData();
-        // Your logic to retrieve training sessions
-        return response()->json(['message' => 'Training sessions retrieved successfully.']);
+         $user = Auth::user();
+
+           if (!$user) {
+            return response()->json(['message' => 'Użytkownik nie jest zalogowany.'], 401);
+        }
+        $exercises = TrainingSessions::where('user_id', $user->id)->get();
+
+        $formattedExercises = $exercises->map(function ($exercise) {
+
+            return [
+                'id' => $exercise->id,
+                'exercise_table_id' => $exercise->exercise_table_id,
+                'started_at' => $exercise->started_at,
+                'duration' => $exercise->duration,
+                'completed' => $exercise->completed,
+                'total_weight' => $exercise->total_weight,
+                'description' => $exercise->description,
+                'image_base64' => $exercise->image_base64,
+                'exercises' => $exercise->exercises->map(function ($ex) {
+                    return [
+                        'exercise_id' => $ex->exercise_id,
+                        'notes' => $ex->notes,
+                        'sets' => $ex->sets->map(function ($set) {
+                            return [
+                                'colStep' => $set->colStep,
+                                'actual_kg' => $set->actual_kg,
+                                'actual_reps' => $set->actual_reps,
+                                'completed' => $set->completed,
+                                'to_failure' => $set->to_failure,
+                            ];
+                        }),
+                    ];
+                }),
+            ];
+        });
+
+        return response()->json(['message' => 'Training sessions retrieved successfully.', 'data' => $formattedExercises]);
     }
+
+
+    
     public function store(Request $request)
     {
         Log::info('Received payload:', $request->all());
@@ -38,11 +75,15 @@ class TrainingSesionsController extends Controller
         if (!$user) {
             return response()->json(['message' => 'Użytkownik nie jest zalogowany.'], 401);
         }
+        
+
+       
+        Log::info('Szukam exercise_table_id: ' . $request->exercise_table_id);
         $exerciseTable = \App\Models\ExerciseTable::with('rowsData.rows')->findOrFail($request->exercise_table_id);
 
 
         $this->logSessionData();
-        // Validate and store the training session data
+        
         $request->validate([
             'exercise_table_id' => 'required|exists:exercise_table,id',
             'started_at' => 'required|date',
@@ -65,7 +106,7 @@ class TrainingSesionsController extends Controller
 
         ]);
 
-        //$session = TrainingSessions::create($request->all());
+        
 
         $savedPlannedExercises = [];
 
