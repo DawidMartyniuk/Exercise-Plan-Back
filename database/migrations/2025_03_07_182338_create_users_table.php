@@ -15,6 +15,7 @@ class CreateUsersTable extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->string('password');
+            $table->longText('avatar')->nullable(); // dodaj pole dla awatara
             $table->rememberToken();
             $table->timestamps();
         });
