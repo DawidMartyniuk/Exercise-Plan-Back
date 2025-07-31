@@ -36,51 +36,6 @@ class AuthController extends Controller
 
         return response()->json($user, 201); 
     }
-public function updateProfile(Request $request)
-{
-    $request->validate([
-        'name' => 'sometimes|string|max:255',
-        'avatar' => 'sometimes|string', // base64 string
-    ]);
-
-    $authUser = Auth::user();
-    
-    if (!$authUser) {
-        return response()->json(['message' => 'Użytkownik nie jest zalogowany.'], 401);
-    }
-
-    // Ensure we get the Eloquent User model instance
-    $user = \App\Models\User::find($authUser->id);
-
-    $updateData = [];
-    
-    if ($request->has('name')) {
-        $updateData['name'] = $request->name;
-    }
-    
-    if ($request->has('avatar')) {
-        $updateData['avatar'] = $request->avatar;
-    }
-
-    $user->update($updateData);
-
-    return response()->json([
-        'message' => 'Profil został zaktualizowany.',
-        'user' => $user
-    ]);
-}
-public function getProfile()
-{
-    $user = Auth::user();
-    
-    if (!$user) {
-        return response()->json(['message' => 'Użytkownik nie jest zalogowany.'], 401);
-    }
-
-    return response()->json([
-        'user' => $user
-    ]);
-}
     public function login(Request $request){
 
         $credentials = $request->validate([
