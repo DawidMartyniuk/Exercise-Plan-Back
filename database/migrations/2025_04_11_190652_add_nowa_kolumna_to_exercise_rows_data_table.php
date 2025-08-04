@@ -15,7 +15,7 @@ return new class extends Migration
             Schema::create('exercise_rows_data', function (Blueprint $table) {
                 $table->engine = 'InnoDB'; 
                 $table->id();
-                $table->unsignedBigInteger('exercise_id');
+                $table->string('exercise_id');
                 $table->integer('exercise_number');
                 $table->string('exercise_name');
                 $table->string('notes')->nullable();
