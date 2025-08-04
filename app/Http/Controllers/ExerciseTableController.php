@@ -59,7 +59,7 @@ class ExerciseTableController extends Controller
             'exercises' => 'required|array',
             'exercises.*.exercise_table' => 'required|string',
             'exercises.*.rows' => 'required|array',
-            'exercises.*.rows.*.exercise_number' => 'required|integer',
+            'exercises.*.rows.*.exercise_number' => 'required|string',
             'exercises.*.rows.*.exercise_name' => 'required|string',
             'exercises.*.rows.*.notes' => 'nullable|string',
             'exercises.*.rows.*.data' => 'required|array',
