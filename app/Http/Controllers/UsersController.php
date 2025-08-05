@@ -29,19 +29,19 @@ class UsersController extends Controller
      */
     public function updateProfile(Request $request)
     {
-        $request->validate([
-            'name' => 'sometimes|string|max:255',
-            'email' => 'sometimes|email|unique:users,email,',
-            'description' => 'sometimes|string|max:500',
-            'weight' => 'sometimes|integer|min:1|max:500',
-            'avatar' => 'required|string',
-        ]);
-
         $userId = Auth::id();
 
         if (!$userId) {
             return response()->json(['message' => 'Użytkownik nie jest zalogowany.'], 401);
         }
+
+        $request->validate([
+            'name' => 'sometimes|string|max:255',
+            'email' => 'sometimes|email|unique:users,email,' . $userId, // Wyklucz aktualnego użytkownika
+            'description' => 'sometimes|string|max:500',
+            'weight' => 'sometimes|integer|min:1|max:500',
+            'avatar' => 'sometimes|string',
+        ]);
 
         // Pobierz użytkownika bezpośrednio z bazy
         $user = User::find($userId);
@@ -67,6 +67,7 @@ class UsersController extends Controller
         if ($request->has('weight')) {
             $updateData['weight'] = $request->weight;
         }
+        
         if ($request->has('avatar')) {
             $updateData['avatar'] = $request->avatar;
         }
