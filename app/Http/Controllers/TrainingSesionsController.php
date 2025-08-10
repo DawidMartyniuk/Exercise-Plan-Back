@@ -148,4 +148,30 @@ class TrainingSesionsController extends Controller
             'planned_exercises' => $savedPlannedExercises,
         ], status: 200);
     }
+    public function delete($id)
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            return response()->json(['message' => 'Użytkownik nie jest zalogowany.'], 401);
+        }
+
+        $session = TrainingSessions::where('id', $id)
+                                   ->where('user_id', $user->id)
+                                   ->first();
+        if (!$session) {
+            return response()->json(['message' => 'Sesja treningowa nie została znaleziona.'], 404);
+        }
+
+        // Usuwanie powiązanych ćwiczeń i zestawów treningowych
+        $session->exercises()->each(function ($exercise) {
+            $exercise->sets()->delete();
+            $exercise->delete();
+        });
+
+        // Usuwanie samej sesji
+        $session->delete();
+
+        return response()->json(['message' => 'Sesja treningowa została usunięta.'], 200);
+    }
 }

@@ -38,7 +38,8 @@ Route::prefix('api')->middleware('jwt.auth')->group(function () {
     Route::get('/training-sessions', [TrainingSesionsController::class, 'index']);
 
     Route::post('/training-sessions', [TrainingSesionsController::class, 'store']);
-    
+
+    Route::delete('/training-sessions/{id}', [TrainingSesionsController::class, 'delete']);
 
      Route::post('/logout', [AuthController::class, 'logout']);
 });
