@@ -11,10 +11,12 @@ use Illuminate\Support\Facades\Route;
 // Routy bez jwt.auth
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+
 Route::post('/reset-request', [ResetPasswordController::class, 'sendResetLinkEmail'])
     ->name('password.email');
+
 Route::post('/reset-password', [ResetPasswordController::class, 'reset'])
-    ->name('api.password.reset'); // Zmień nazwę na api.password.reset
+    ->name('password.reset'); 
 
 
 // Routy z jwt.auth
