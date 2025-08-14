@@ -9,6 +9,7 @@ use App\Models\TrainingSessions;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Laravel\Sanctum\HasApiTokens;
 use Tymon\JWTAuth\Contracts\JWTSubject; // Upewnij się, że ten namespace jest dodany
+use App\Notifications\CustomResetPassword;
 
 class User extends Authenticatable implements JWTSubject // Upewnij się, że implementujesz JWTSubject
 {
@@ -54,6 +55,11 @@ class User extends Authenticatable implements JWTSubject // Upewnij się, że im
     {
         return $this->getKey();
     }
+//     public function sendPasswordResetNotification($token)
+// {
+//     $this->notify(new CustomResetPassword($token));
+// }
+
 
     public function getJWTCustomClaims(): array
     {
