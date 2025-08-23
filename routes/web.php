@@ -8,15 +8,17 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// Klasyczny formularz resetu (dla przeglądarki)
+// Klasyczny formularz  resetu (dla przeglądarki)
 Route::get('/reset-password/{token}', [ResetPasswordController::class, 'showResetForm'])
     ->name('password.reset.form');
 
-// Deep link otwierający aplikację mobilną
 Route::get('/open-reset/{token}', function (string $token) {
-    $email = request('email'); // pobiera ?email=...
-    $deepLink = "myapp://reset-password?token=" . urlencode($token) . "&email=" . urlencode($email ?? '');
+    $email = request('email');
 
-    // Przekierowanie – jeśli appka jest zainstalowana, system zaproponuje jej otwarcie
+    // deep link do apki
+    $deepLink = "myapp://open-reset/{$token}?email=" . urlencode($email ?? '');
+
+    // jeśli na telefonie z apka – otworzy ją
+    // jeśli na desktopie – pokaże np. komunikat
     return redirect()->away($deepLink);
 })->name('password.open');
