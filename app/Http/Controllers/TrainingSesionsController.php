@@ -5,12 +5,15 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use App\Models\TrainingSessions; // Use the correct model name if it exists
+use App\Models\TrainingSessions;
 use App\Models\TrainingExercises;
 use App\Models\TrainingSets;
+use App\Traits\WeightConversion;
 
 class TrainingSesionsController extends Controller
 {
+    use WeightConversion;
+
     /**
      * Log the user ID and session data.
      */
@@ -25,14 +28,23 @@ class TrainingSesionsController extends Controller
     }
     public function index()
     {
-         $user = Auth::user();
+        $user = Auth::user();
 
-           if (!$user) {
+        if (!$user) {
             return response()->json(['message' => 'Użytkownik nie jest zalogowany.'], 401);
         }
-        $exercises = TrainingSessions::where('user_id', $user->id)->get();
+        
+        $exercises = TrainingSessions::where('user_id', $user->id)
+            ->with(['exercises.sets'])
+            ->get();
 
-        $formattedExercises = $exercises->map(function ($exercise) {
+        $formattedExercises = $exercises->map(function ($exercise) use ($user) {
+            // Konwertuj wagi zgodnie z preferencjami użytkownika
+            $totalWeightConverted = $this->convertWeight(
+                $exercise->total_weight, 
+                $exercise->weight_type ?? 'kg', 
+                $user->preferred_weight_unit ?? 'kg'
+            );
 
             return [
                 'id' => $exercise->id,
@@ -41,18 +53,28 @@ class TrainingSesionsController extends Controller
                 'started_at' => $exercise->started_at,
                 'duration' => $exercise->duration,
                 'completed' => $exercise->completed,
-                'total_weight' => $exercise->total_weight,
+                'total_weight' => $totalWeightConverted,
+                'weight_unit' => $user->preferred_weight_unit ?? 'kg',
+                'original_weight_unit' => $exercise->weight_type ?? 'kg',
                 'description' => $exercise->description,
                 'image_base64' => $exercise->image_base64,
-                'exercises' => $exercise->exercises->map(function ($ex) {
+                'exercises' => $exercise->exercises->map(function ($ex) use ($user) {
                     return [
                         'exercise_id' => $ex->exercise_id,
                         'notes' => $ex->notes,
-                        'sets' => $ex->sets->map(function ($set) {
+                        'sets' => $ex->sets->map(function ($set) use ($user) {
+                            $actualKgConverted = $this->convertWeight(
+                                $set->actual_kg, 
+                                $set->weight_type ?? 'kg', 
+                                $user->preferred_weight_unit ?? 'kg'
+                            );
+
                             return [
                                 'colStep' => $set->colStep,
-                                'actual_kg' => $set->actual_kg,
+                                'actual_kg' => $actualKgConverted,
                                 'actual_reps' => $set->actual_reps,
+                                'weight_unit' => $user->preferred_weight_unit ?? 'kg',
+                                'original_weight_unit' => $set->weight_type ?? 'kg',
                                 'completed' => $set->completed,
                                 'to_failure' => $set->to_failure,
                             ];
@@ -62,11 +84,13 @@ class TrainingSesionsController extends Controller
             ];
         });
 
-        return response()->json(['message' => 'Training sessions retrieved successfully.', 'data' => $formattedExercises]);
+        return response()->json([
+            'message' => 'Training sessions retrieved successfully.', 
+            'data' => $formattedExercises,
+            'user_preferred_unit' => $user->preferred_weight_unit ?? 'kg'
+        ]);
     }
 
-
-    
     public function store(Request $request)
     {
         Log::info('Received payload:', $request->all());
@@ -76,15 +100,7 @@ class TrainingSesionsController extends Controller
         if (!$user) {
             return response()->json(['message' => 'Użytkownik nie jest zalogowany.'], 401);
         }
-        
 
-       
-        Log::info('Szukam exercise_table_id: ' . $request->exercise_table_id);
-        $exerciseTable = \App\Models\ExerciseTable::with('rowsData.rows')->findOrFail($request->exercise_table_id);
-
-
-        $this->logSessionData();
-        
         $request->validate([
             'exercise_table_id' => 'required|exists:exercise_table,id',
             'exercise_table_name' => 'required|string|max:255',
@@ -92,25 +108,25 @@ class TrainingSesionsController extends Controller
             'duration' => 'nullable',
             'completed' => 'boolean',
             'total_weight' => 'nullable|numeric',
+            'weight_unit' => 'nullable|in:kg,lbs', // Dodaj walidację jednostki
             'description' => 'nullable|string',
             'image_base64' => 'nullable|string',
-
             'exercises' => 'required|array',
             'exercises.*.exercise_id' => 'required|string',
             'exercises.*.notes' => 'nullable|string',
-
             'exercises.*.sets' => 'required|array',
-
             'exercises.*.sets.*.actual_kg' => 'nullable|numeric',
             'exercises.*.sets.*.actual_reps' => 'nullable|integer',
+            'exercises.*.sets.*.weight_unit' => 'nullable|in:kg,lbs', // Dodaj walidację jednostki
             'exercises.*.sets.*.completed' => 'boolean',
             'exercises.*.sets.*.to_failure' => 'boolean',
-
         ]);
 
-        
+        $exerciseTable = \App\Models\ExerciseTable::with('rowsData.rows')
+            ->findOrFail($request->exercise_table_id);
 
-        $savedPlannedExercises = [];
+        // Użyj jednostki z requestu lub domyślnej preferencji użytkownika
+        $weightUnit = $request->weight_unit ?? $user->preferred_weight_unit ?? 'kg';
 
         $sesions = TrainingSessions::create([
             "user_id" => $user->id,
@@ -120,34 +136,40 @@ class TrainingSesionsController extends Controller
             "duration" => $request->duration,
             "completed" => $request->completed,
             "total_weight" => $request->total_weight,
+            "weight_type" => $weightUnit, // Dodaj jednostkę
             "description" => $request->description,
             "image_base64" => $request->image_base64,
         ]);
 
-        foreach( $request->exercises as $exerciseData) {
+        foreach($request->exercises as $exerciseData) {
             $exercise = TrainingExercises::create([
                 'training_session_id' => $sesions->id,
                 'exercise_id' => $exerciseData['exercise_id'],
                 'notes' => $exerciseData['notes'] ?? null,
             ]);
+            
             foreach($exerciseData['sets'] as $setData){
+                $setWeightUnit = $setData['weight_unit'] ?? $weightUnit;
+                
                 $set = TrainingSets::create([
                     'training_exercise_id' => $exercise->id,
                     'colStep' => $setData['colStep'],
                     'actual_kg' => $setData['actual_kg'] ?? null,
                     'actual_reps' => $setData['actual_reps'] ?? null,
+                    'weight_type' => $setWeightUnit, // Dodaj jednostkę
                     'completed' => $setData['completed'] ?? false,
                     'to_failure' => $setData['to_failure'] ?? false,
                 ]);
             }
         }
-        $savedPlannedExercises[] = $sesions;
 
         return response()->json([
             'message' => 'Training session created successfully.',
-            'planned_exercises' => $savedPlannedExercises,
-        ], status: 200);
+            'session' => $sesions,
+            'weight_unit_used' => $weightUnit,
+        ], 200);
     }
+
     public function delete($id)
     {
         $user = Auth::user();

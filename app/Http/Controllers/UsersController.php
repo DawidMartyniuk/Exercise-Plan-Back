@@ -40,6 +40,7 @@ class UsersController extends Controller
             'email' => 'sometimes|email|unique:users,email,' . $userId, // Wyklucz aktualnego użytkownika
             'description' => 'sometimes|string|max:500',
             'weight' => 'sometimes|integer|min:1|max:500',
+            'preferred_weight_unit' => 'sometimes|in:kg,lbs',
             'avatar' => 'sometimes|string',
         ]);
 
@@ -67,6 +68,9 @@ class UsersController extends Controller
         if ($request->has('weight')) {
             $updateData['weight'] = $request->weight;
         }
+        if ($request->has('preferred_weight_unit')) {
+            $updateData['preferred_weight_unit'] = $request->preferred_weight_unit;
+        }
         
         if ($request->has('avatar')) {
             $updateData['avatar'] = $request->avatar;
@@ -76,7 +80,7 @@ class UsersController extends Controller
 
         return response()->json([
             'message' => 'Profil został zaktualizowany.',
-            'user' => $user
+            'user' => $user->fresh()
         ]);
     }
 
@@ -145,6 +149,31 @@ class UsersController extends Controller
         return response()->json([
             'message' => 'Avatar został usunięty.',
             'user' => $user
+        ]);
+    }
+
+    public function updateWeightPreferences(Request $request)
+    {
+        $request->validate([
+            'preferred_weight_unit' => 'required|in:kg,lbs',
+        ]);
+
+        $userId = Auth::id();
+
+        $user = User::find($userId);
+
+        if (!$user) {
+            return response()->json(['message' => 'Użytkownik nie jest zalogowany.'], 401);
+        }
+
+        $user->update([
+            'preferred_weight_unit' => $request->preferred_weight_unit,
+        ]);
+
+        return response()->json([
+            'message' => 'Preferencje jednostek zostały zaktualizowane.',
+            'user' => $user,
+            'preferred_weight_unit' => $user->preferred_weight_unit
         ]);
     }
 }

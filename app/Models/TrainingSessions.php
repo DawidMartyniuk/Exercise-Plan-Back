@@ -17,6 +17,7 @@ class TrainingSessions extends Model
         'started_at',
         'duration', 
         'completed',
+        'weight_unit',
         'total_weight',
         'description',
         'image_base64',
@@ -29,10 +30,24 @@ class TrainingSessions extends Model
     {
             return $this->belongsTo(ExerciseTable::class);
     }
-//     public function trainingExercise()
-//     {
-//             return $this->hasMany(ExerciseTable::class, 'exercise_table_id');
-//     }
+    public function getCronvertedTotalWeightAttribute()
+    {
+         $user = $this->user;
+        if ($user && $user->preferred_weight_unit !== $this->weight_type) {
+            return $this->convertWeight(
+                $this->total_weight, 
+                $this->weight_type, 
+                $user->preferred_weight_unit
+            );
+        }
+        return $this->total_weight;
+    }
+      public function getDisplayUnitAttribute()
+    {
+        $user = $this->user;
+        return $user ? $user->preferred_weight_unit : $this->weight_type;
+    }
+
     public function exercises()
     {
         return $this->hasMany(TrainingExercises::class,'training_session_id' );

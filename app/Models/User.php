@@ -30,6 +30,7 @@ class User extends Authenticatable implements JWTSubject // Upewnij się, że im
         'email',
         'password',
         'description',
+        'preferred_weight_unit',
         'weight',
         'avatar',
     ];
