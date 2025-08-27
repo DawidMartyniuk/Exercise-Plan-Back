@@ -16,9 +16,10 @@ return new class extends Migration
                 $table->id();
                 $table->unsignedBigInteger('training_exercise_id');
                 $table->integer('colStep');
-                $table->integer('planned_kg')->nullable();
-                $table->integer('planned_reps')->nullable();
+               // $table->integer('planned_kg')->nullable();
+                //$table->integer('planned_reps')->nullable();
                 $table->integer('actual_kg')->nullable();
+                $table->enum('weight_type', ['kg', 'lbs'])->default('kg'); 
                 $table->integer('actual_reps')->nullable();
                 $table->boolean('completed')->default(false);
                 $table->boolean('to_failure')->default(false); 

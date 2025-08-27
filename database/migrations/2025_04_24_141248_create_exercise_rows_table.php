@@ -15,6 +15,7 @@ return new class extends Migration
                 $table->integer('colStep');
                 $table->integer('colKg');
                 $table->integer('colRep');
+                $table->enum('weight_unit', ['kg', 'lbs'])->default('kg')->after('colRep');
                 $table->timestamps();
     
                 $table->foreign('row_data_id')->references('id')->on('exercise_rows_data')->onDelete('cascade');

@@ -6,12 +6,15 @@ use Illuminate\Http\Request;
 use App\Models\ExerciseTable;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use App\Traits\WeightConversion;
 
 class ExerciseTableController extends Controller
 {
+    use WeightConversion;
     /**
      * Pobierz wszystkie dane exercise_table dla zalogowanego użytkownika.
-     */ public function index()
+     */
+     public function index()
     {
         $user = Auth::user();
 
@@ -27,10 +30,18 @@ class ExerciseTableController extends Controller
                         'exercise_name' => $row->exercise_name,
                         'notes' => $row->notes,
                         'data' => $row->rows->map(function ($dataRow) {
+
+                               $convertedWeight = $this->convertWeight(
+                                $dataRow->colKg, 
+                                $dataRow->weight_unit ?? 'kg', 
+                                $user->preferred_weight_unit ?? 'kg'
+                            );
                             return [
                                 'colStep' => $dataRow->colStep,
-                                'colKg' => $dataRow->colKg,
+                                'colKg' => $convertedWeight,
                                 'colRep' => $dataRow->colRep,
+                                 'weight_unit' => $user->preferred_weight_unit ?? 'kg',
+                                'original_weight_unit' => $dataRow->weight_unit ?? 'kg',
                             ];
                         }),
                     ];
@@ -66,6 +77,7 @@ class ExerciseTableController extends Controller
             'exercises.*.rows.*.data.*.colStep' => 'required|integer',
             'exercises.*.rows.*.data.*.colKg' => 'required|integer',
             'exercises.*.rows.*.data.*.colRep' => 'required|integer',
+             'exercises.*.rows.*.data.*.weight_unit' => 'nullable|in:kg,lbs', 
         ]);
 
         $savedExercises = [];
@@ -86,13 +98,16 @@ class ExerciseTableController extends Controller
                     'notes' => $groupedRow['notes'] ??  null,
                 ]);
 
-
                 foreach ($groupedRow['data'] as $row) {
-                    $rowData->rows()->create([
-                        'colStep' => $row['colStep'],
-                        'colKg' => $row['colKg'],
-                        'colRep' => $row['colRep'],
-                    ]);
+                    $weightUnit = $row['weight_unit'] ?? $user->preferred_weight_unit ?? 'kg';
+
+
+                 $rowData->rows()->create([
+                    'colStep' => $row['colStep'],
+                    'colKg' => $row['colKg'],
+                    'colRep' => $row['colRep'],
+                    'weight_unit' => $weightUnit,
+                 ]);
                 }
             }
 
@@ -102,10 +117,9 @@ class ExerciseTableController extends Controller
         return response()->json([
             'message' => 'Ćwiczenia zostały zapisane.',
             'exercises' => $savedExercises,
+            'weight_unit_used' => $user->preferred_weight_unit ?? 'kg'
         ], 200);
     }
-
-
 
     public function destroy($id)
     {
@@ -118,7 +132,7 @@ class ExerciseTableController extends Controller
             return response()->json(['message' => 'Nie znaleziono ćwiczenia lub brak dostępu.'], 404);
         }
         // Usunięcie wszystkich powiązanych danych
-        $exercise->delete();
+       
         $exercise->rowsData()->each(function($row) {
             $row->rows()->delete();
             $row->rows()->each(function($dataRow) {
@@ -126,6 +140,7 @@ class ExerciseTableController extends Controller
             });
 
         });
+         $exercise->delete();
 
          return response()->json(['message' => 'Cały plan został usunięty.'], 200);
 
@@ -152,7 +167,7 @@ class ExerciseTableController extends Controller
 
         // Aktualizacja danych
         $exercise->update([
-            'exercise_table' => $request->exercise_name,
+           'exercise_table' => $request->exercise_table,
         ]);
 
         return response()->json(['message' => 'Dane zostały zaktualizowane.', 'exercise' => $exercise]);

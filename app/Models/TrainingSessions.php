@@ -17,7 +17,7 @@ class TrainingSessions extends Model
         'started_at',
         'duration', 
         'completed',
-        'weight_unit',
+        'weight_unit',//
         'total_weight',
         'description',
         'image_base64',

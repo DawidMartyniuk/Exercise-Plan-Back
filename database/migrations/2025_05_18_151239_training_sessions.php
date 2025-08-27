@@ -21,9 +21,10 @@ return new class extends Migration
                $table->integer('duration')->nullable();
                 $table->timestamp('ended_at')->nullable(); // zamiast tego ile czasu trwał trening
                 $table->boolean('completed')->default(true);
-                $table->double('total_weight')->nullable(); 
-                $table->text('description')->nullable(); 
-                $table->longText('image_base64')->nullable(); 
+                $table->double('total_weight')->nullable();
+                $table->enum('weight_type', ['kg', 'lbs'])->default('kg');
+                $table->text('description')->nullable();
+                $table->longText('image_base64')->nullable();
                 $table->timestamps();
 
                 $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

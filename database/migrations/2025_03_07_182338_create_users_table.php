@@ -17,6 +17,7 @@ class CreateUsersTable extends Migration
             $table->string('password');
             $table->longText('avatar')->nullable(); // dodaj pole dla awatara
             $table->string('description')->nullable();
+            $table->enum('preferred_weight_unit', ['kg', 'lbs'])->default('kg');
             $table->integer('weight')->nullable();
             $table->rememberToken();
             $table->timestamps();
