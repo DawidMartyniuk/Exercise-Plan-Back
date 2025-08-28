@@ -18,6 +18,7 @@ return new class extends Migration
                 $table->string('exercise_id');
                 $table->integer('exercise_number');
                 $table->string('exercise_name');
+                $table->enum('rep_type', ['single', 'range'])->default('single')->after('notes');
                 $table->string('notes')->nullable();
                 $table->timestamps();
     

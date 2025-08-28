@@ -15,6 +15,7 @@ class ExerciseRowsData extends Model
         'exercise_number',
         'exercise_name',
         'notes',
+        'rep_type',
     ];
    
     public function exercise(): BelongsTo

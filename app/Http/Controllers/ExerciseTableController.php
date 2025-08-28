@@ -29,6 +29,7 @@ class ExerciseTableController extends Controller
                         'exercise_number' => $row->exercise_number,
                         'exercise_name' => $row->exercise_name,
                         'notes' => $row->notes,
+                        'rep_type' => $row->rep_type,
                         'data' => $row->rows->map(function ($dataRow) {
 
                                $convertedWeight = $this->convertWeight(
@@ -39,9 +40,12 @@ class ExerciseTableController extends Controller
                             return [
                                 'colStep' => $dataRow->colStep,
                                 'colKg' => $convertedWeight,
-                                'colRep' => $dataRow->colRep,
-                                 'weight_unit' => $user->preferred_weight_unit ?? 'kg',
+                                'colRepMin' => $dataRow->colRepMin,
+                                'colRepMax' => $dataRow->colRepMax,
+                                'weight_unit' => $user->preferred_weight_unit ?? 'kg',
                                 'original_weight_unit' => $dataRow->weight_unit ?? 'kg',
+                                'rep_display' => $dataRow->rep_display, // "6" lub "5-7"
+                                'is_range' => $dataRow->isRepRange(),
                             ];
                         }),
                     ];
@@ -73,11 +77,13 @@ class ExerciseTableController extends Controller
             'exercises.*.rows.*.exercise_number' => 'required|string',
             'exercises.*.rows.*.exercise_name' => 'required|string',
             'exercises.*.rows.*.notes' => 'nullable|string',
+            'exercises.*.rows.*.rep_type' => 'required|in:single,range',
             'exercises.*.rows.*.data' => 'required|array',
             'exercises.*.rows.*.data.*.colStep' => 'required|integer',
             'exercises.*.rows.*.data.*.colKg' => 'required|integer',
-            'exercises.*.rows.*.data.*.colRep' => 'required|integer',
-             'exercises.*.rows.*.data.*.weight_unit' => 'nullable|in:kg,lbs', 
+            'exercises.*.rows.*.data.*.colRepMin' => 'required|integer',
+            'exercises.*.rows.*.data.*.colRepMax' => 'nullable|integer', // Może być null dla single
+            'exercises.*.rows.*.data.*.weight_unit' => 'nullable|in:kg,lbs', 
         ]);
 
         $savedExercises = [];
@@ -96,6 +102,7 @@ class ExerciseTableController extends Controller
                     'exercise_number' => $groupedRow['exercise_number'],
                     'exercise_name' => $groupedRow['exercise_name'],
                     'notes' => $groupedRow['notes'] ??  null,
+                    'rep_type' => $groupedRow['rep_type'],
                 ]);
 
                 foreach ($groupedRow['data'] as $row) {
@@ -105,7 +112,9 @@ class ExerciseTableController extends Controller
                  $rowData->rows()->create([
                     'colStep' => $row['colStep'],
                     'colKg' => $row['colKg'],
-                    'colRep' => $row['colRep'],
+                    //'colRep' => $row['colRep'],
+                    'colRepMin' => $row['colRepMin'],
+                    'colRepMax' => $row['colRepMax'] ?? $row['colRepMin'],
                     'weight_unit' => $weightUnit,
                  ]);
                 }
