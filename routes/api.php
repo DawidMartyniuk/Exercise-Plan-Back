@@ -29,6 +29,7 @@ Route::middleware('jwt.auth')->group(function () {
     Route::get('/exercises', [ExerciseTableController::class, 'index']);
     Route::post('/exercises', [ExerciseTableController::class, 'store']);
     Route::delete('/exercises/{id}', [ExerciseTableController::class, 'destroy']);
+    Route::put('/exercises/{id}', [ExerciseTableController::class, 'update']);
 
     Route::get('/training-sessions', [TrainingSesionsController::class, 'index']);
     Route::post('/training-sessions', [TrainingSesionsController::class, 'store']);
