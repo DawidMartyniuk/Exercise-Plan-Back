@@ -26,10 +26,10 @@ Route::middleware('jwt.auth')->group(function () {
     Route::post('/profile/avatar', [UsersController::class, 'updateAvatar']);
     Route::delete('/profile/avatar', [UsersController::class, 'deleteAvatar']);
 
-    Route::get('/exercises', [ExerciseTableController::class, 'index']);
-    Route::post('/exercises', [ExerciseTableController::class, 'store']);
-    Route::delete('/exercises/{id}', [ExerciseTableController::class, 'destroy']);
-    Route::put('/exercises/{id}', [ExerciseTableController::class, 'update']);
+    Route::get('/plan', [ExerciseTableController::class, 'index']);
+    Route::post('/plan', [ExerciseTableController::class, 'store']);
+    Route::delete('/plan/{id}', [ExerciseTableController::class, 'destroy']);
+    Route::put('/plan/{id}', [ExerciseTableController::class, 'update']);
 
     Route::get('/training-sessions', [TrainingSesionsController::class, 'index']);
     Route::post('/training-sessions', [TrainingSesionsController::class, 'store']);

@@ -226,10 +226,10 @@ class ExerciseTableController extends Controller
             }
         }
 
-        // Załaduj zaktualizowane dane
+        
         $updatedExercise = $exercise->load('rowsData.rows');
 
-        // Sformatuj odpowiedź podobnie jak w metodzie index
+        
         $formattedExercise = [
             'id' => $updatedExercise->id,
             'exercise_table' => $updatedExercise->exercise_table,
