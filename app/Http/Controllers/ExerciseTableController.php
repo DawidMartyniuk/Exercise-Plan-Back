@@ -82,7 +82,7 @@ class ExerciseTableController extends Controller
             'exercises.*.rows.*.data.*.colStep' => 'required|integer',
             'exercises.*.rows.*.data.*.colKg' => 'required|integer',
             'exercises.*.rows.*.data.*.colRepMin' => 'required|integer',
-            'exercises.*.rows.*.data.*.colRepMax' => 'nullable|integer', // Może być null dla single
+            'exercises.*.rows.*.data.*.colRepMax' => 'nullable|integer', 
             'exercises.*.rows.*.data.*.weight_unit' => 'nullable|in:kg,lbs', 
         ]);
 
@@ -139,9 +139,9 @@ class ExerciseTableController extends Controller
             return response()->json(['message' => 'Nie znaleziono ćwiczenia lub brak dostępu.'], 404);
         }
 
-        // Prawidłowa kolejność usuwania - od najgłębszych relacji do głównej tabeli
+       
         
-        // 1. Usuń wszystkie exercise_rows (najgłębsza relacja)
+       
         $exercise->rowsData()->each(function($rowData) {
             $rowData->rows()->delete(); // Usuń exercise_rows dla każdego rowData
         });

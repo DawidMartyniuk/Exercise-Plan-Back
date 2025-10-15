@@ -49,10 +49,10 @@ class TrainingSesionsController extends Controller
             return [
                 'id' => $exercise->id,
                 'exercise_table_id' => $exercise->exercise_table_id,
-                'exercise_table_name' => $exercise->exerciseTableName,
+                //'exercise_table_name' => $exercise->exerciseTableName,
                 'started_at' => $exercise->started_at,
                 'duration' => $exercise->duration,
-                'completed' => $exercise->completed,
+               // 'completed' => $exercise->completed,
                 'total_weight' => $totalWeightConverted,
                 'weight_unit' => $user->preferred_weight_unit ?? 'kg',
                 'original_weight_unit' => $exercise->weight_type ?? 'kg',
@@ -103,12 +103,12 @@ class TrainingSesionsController extends Controller
 
         $request->validate([
             'exercise_table_id' => 'required|exists:exercise_table,id',
-            'exercise_table_name' => 'required|string|max:255',
+          //  'exercise_table_name' => 'required|string|max:255',
             'started_at' => 'required|date',
             'duration' => 'nullable',
-            'completed' => 'boolean',
+          //  'completed' => 'boolean',
             'total_weight' => 'nullable|numeric',
-            'weight_unit' => 'nullable|in:kg,lbs', // Dodaj walidację jednostki
+            'weight_unit' => 'nullable|in:kg,lbs', 
             'description' => 'nullable|string',
             'image_base64' => 'nullable|string',
             'exercises' => 'required|array',
@@ -117,7 +117,7 @@ class TrainingSesionsController extends Controller
             'exercises.*.sets' => 'required|array',
             'exercises.*.sets.*.actual_kg' => 'nullable|numeric',
             'exercises.*.sets.*.actual_reps' => 'nullable|integer',
-            'exercises.*.sets.*.weight_unit' => 'nullable|in:kg,lbs', // Dodaj walidację jednostki
+            'exercises.*.sets.*.weight_unit' => 'nullable|in:kg,lbs', 
             'exercises.*.sets.*.completed' => 'boolean',
             'exercises.*.sets.*.to_failure' => 'boolean',
         ]);
@@ -131,10 +131,10 @@ class TrainingSesionsController extends Controller
         $sesions = TrainingSessions::create([
             "user_id" => $user->id,
             "exercise_table_id" => $request->exercise_table_id,
-            "exerciseTableName" => $exerciseTable->name, 
+           // "exerciseTableName" => $exerciseTable->name, 
             "started_at" => $request->started_at,
             "duration" => $request->duration,
-            "completed" => $request->completed,
+           // "completed" => $request->completed,
             "total_weight" => $request->total_weight,
             "weight_type" => $weightUnit, // Dodaj jednostkę
             "description" => $request->description,
@@ -169,6 +169,125 @@ class TrainingSesionsController extends Controller
             'weight_unit_used' => $weightUnit,
         ], 200);
     }
+    public function update(Request $request, $id){
+
+        $user = Auth::user();
+
+    if (!$user) {
+        return response()->json(['message' => 'Użytkownik nie jest zalogowany.'], 401);
+    }
+
+    $sesions = TrainingSessions::where('id', $id)->where('user_id', $user->id)->first();
+
+    if (!$sesions) {
+        return response()->json(['message' => 'Sesja treningowa nie została znaleziona.'], 404);
+    }
+
+    // POPRAWKA: Usuń podwójną walidację
+    $request->validate([
+        'exercise_table_id' => 'required|exists:exercise_table,id',
+        'started_at' => 'required|date',
+        'duration' => 'nullable|integer',
+        'total_weight' => 'nullable|numeric',
+        'weight_unit' => 'nullable|in:kg,lbs', 
+        'description' => 'nullable|string',
+        'image_base64' => 'nullable|string',
+        'exercises' => 'required|array',
+        'exercises.*.exercise_id' => 'required|string',
+        'exercises.*.notes' => 'nullable|string',
+        'exercises.*.sets' => 'required|array',
+        'exercises.*.sets.*.colStep' => 'required|integer',
+        'exercises.*.sets.*.actual_kg' => 'nullable|numeric',
+        'exercises.*.sets.*.actual_reps' => 'nullable|integer',
+        'exercises.*.sets.*.weight_unit' => 'nullable|in:kg,lbs', 
+        'exercises.*.sets.*.completed' => 'nullable|boolean',
+        'exercises.*.sets.*.to_failure' => 'nullable|boolean',
+    ]);
+
+    try{
+        // POPRAWKA: Usuń pola które nie istnieją w modelu
+        $sesions->update([
+            'exercise_table_id' => $request->exercise_table_id,
+            'started_at' => $request->started_at,
+            'duration' => $request->duration,
+            'total_weight' => $request->total_weight,
+            'weight_unit' => $request->weight_unit ?? 'kg',
+            'description' => $request->description,
+            'image_base64' => $request->image_base64,
+        ]);
+
+        // Usuń stare ćwiczenia i zestawy
+        if ($request->has('exercises')) {
+            $sesions->exercises()->each(function ($exercise) {
+                $exercise->sets()->delete();
+                $exercise->delete();
+            });
+        }
+
+        // Dodaj nowe ćwiczenia
+        foreach($request->exercises as $exerciseData) {
+            $exercise = TrainingExercises::create([
+                'training_session_id' => $sesions->id,
+                'exercise_id' => $exerciseData['exercise_id'],
+                'notes' => $exerciseData['notes'] ?? null,
+            ]);
+            
+            foreach($exerciseData['sets'] as $setData){
+                $setWeightUnit = $setData['weight_unit'] ?? ($request->weight_unit ?? 'kg');
+                
+                TrainingSets::create([
+                    'training_exercise_id' => $exercise->id,
+                    'colStep' => $setData['colStep'],
+                    'actual_kg' => $setData['actual_kg'] ?? null,
+                    'actual_reps' => $setData['actual_reps'] ?? null,
+                    'weight_type' => $setWeightUnit, 
+                    'completed' => $setData['completed'] ?? false,
+                    'to_failure' => $setData['to_failure'] ?? false,
+                ]);
+            }
+        }
+
+        $updateSessions = $sesions->load(['exercises.sets']);
+        
+        $formatedSession = [
+            'id' => $updateSessions->id,
+            'exercise_table_id' => $updateSessions->exercise_table_id,
+            'started_at' => $updateSessions->started_at,
+            'duration' => $updateSessions->duration,
+            'total_weight' => $updateSessions->total_weight,
+            'weight_unit' => $updateSessions->weight_unit,
+            'description' => $updateSessions->description,
+            'image_base64' => $updateSessions->image_base64,
+            'exercises' => $updateSessions->exercises->map(function ($ex) {
+                return [
+                    'exercise_id' => $ex->exercise_id,
+                    'notes' => $ex->notes,
+                    'sets' => $ex->sets->map(function ($set) {
+                        return [
+                            'colStep' => $set->colStep,
+                            'actual_kg' => $set->actual_kg,
+                            'actual_reps' => $set->actual_reps,
+                            'weight_unit' => $set->weight_type,
+                            'completed' => $set->completed,
+                            'to_failure' => $set->to_failure,
+                        ];
+                    }),
+                ];
+            }),  
+        ];
+
+        return response()->json([
+            'message' => 'Sesja treningowa została zaktualizowana pomyślnie.',
+            'session' => $formatedSession,
+        ], 200);
+        
+    } catch (\Exception $e) {
+        return response()->json([
+            'message' => 'Wystąpił błąd podczas aktualizacji sesji treningowej.',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
 
     public function delete($id)
     {

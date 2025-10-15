@@ -5,6 +5,7 @@ use App\Http\Controllers\ExerciseTableController;
 use App\Http\Controllers\TrainingSesionsController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\UsersController;
+use App\Http\Controllers\ExerciseController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -34,6 +35,16 @@ Route::middleware('jwt.auth')->group(function () {
     Route::get('/training-sessions', [TrainingSesionsController::class, 'index']);
     Route::post('/training-sessions', [TrainingSesionsController::class, 'store']);
     Route::delete('/training-sessions/{id}', [TrainingSesionsController::class, 'delete']);
+    Route::put('/training-sessions/{id}', [TrainingSesionsController::class, 'update']);
+
+    Route::get('/exercises', [ExerciseController::class, 'index']);
+    Route::post('/exercises', [ExerciseController::class, 'create']);
+    //TODO: dorobić edytowanie i usuwanie ćwiczeń
 
     Route::post('/logout', [AuthController::class, 'logout']);
+});
+Route::get('/test-image', function() {
+    return response()->json([
+        'image_url' => asset('storage/gifs/aPFlkyJHmq5Wwso5V8XSZBHjF7pVRAMRuydPseEr.png')
+    ]);
 });

@@ -13,11 +13,11 @@ class TrainingSessions extends Model
       protected $fillable = [
         'user_id',
         'exercise_table_id',
-        'exercise_table_name',
+        //'exercise_table_name',
         'started_at',
         'duration', 
-        'completed',
-        'weight_unit',//
+        //'completed',
+        'weight_type',//
         'total_weight',
         'description',
         'image_base64',
