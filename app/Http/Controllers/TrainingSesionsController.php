@@ -49,10 +49,10 @@ class TrainingSesionsController extends Controller
             return [
                 'id' => $exercise->id,
                 'exercise_table_id' => $exercise->exercise_table_id,
-                //'exercise_table_name' => $exercise->exerciseTableName,
+               
                 'started_at' => $exercise->started_at,
                 'duration' => $exercise->duration,
-               // 'completed' => $exercise->completed,
+             
                 'total_weight' => $totalWeightConverted,
                 'weight_unit' => $user->preferred_weight_unit ?? 'kg',
                 'original_weight_unit' => $exercise->weight_type ?? 'kg',

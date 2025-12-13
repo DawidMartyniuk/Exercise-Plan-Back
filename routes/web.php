@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
-
+use L5Swagger\Http\Controllers\SwaggerController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -45,3 +45,6 @@ Route::get('/test-image', function () {
         'ip' => request()->ip(),
     ])->header('Access-Control-Allow-Origin', '*');
 });
+
+
+Route::get('/api/documentation', [SwaggerController::class, 'api'])->name('l5swagger.default.api');
