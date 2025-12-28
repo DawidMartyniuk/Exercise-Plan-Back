@@ -5,8 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Models\TrainingSessions;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Laravel\Sanctum\HasApiTokens;
 use Tymon\JWTAuth\Contracts\JWTSubject; // Upewnij się, że ten namespace jest dodany
+use App\Notifications\CustomResetPassword;
 
 class User extends Authenticatable implements JWTSubject // Upewnij się, że implementujesz JWTSubject
 {
@@ -26,6 +29,10 @@ class User extends Authenticatable implements JWTSubject // Upewnij się, że im
         'name',
         'email',
         'password',
+        'description',
+        'preferred_weight_unit',
+        'weight',
+        'avatar',
     ];
 
     /**
@@ -38,7 +45,16 @@ class User extends Authenticatable implements JWTSubject // Upewnij się, że im
         'remember_token',
     ];
     public function exercises(){
-        return $this->HasMay(ExerciseTable::class);
+        
+        return $this->hasMany(Exercise::class);
+    }
+    public function exerciseTables(){
+
+        return $this->hasMany(ExerciseTable::class);
+    }
+    public function trainingSessions()
+    {
+        return $this->hasMany(TrainingSessions::class);
     }
     public function getJWTIdentifier()
     {

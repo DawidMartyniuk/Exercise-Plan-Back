@@ -18,14 +18,21 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:6|confirmed',
+            'avatar' => 'sometimes|string', // opcjonalny avatar
         ]);
 
-        
-        $user = User::create([
+        $userData = [
             'name' => $request->name,
             'email' => $request->email,
             'password' => bcrypt($request->password),
-        ]);
+        ];
+
+        // Dodaj avatar tylko jeśli został przesłany
+        if ($request->has('avatar')) {
+            $userData['avatar'] = $request->avatar;
+        }
+
+        $user = User::create($userData);
 
         return response()->json($user, 201); 
     }

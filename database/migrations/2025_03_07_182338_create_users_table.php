@@ -8,14 +8,22 @@ class CreateUsersTable extends Migration
 {
     public function up()
     {
+        if(!Schema::hasTable('users')){
         Schema::create('users', function (Blueprint $table) {
+            $table->engine = 'InnoDB'; 
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
-            $table->string('password');
+            $table->string('password')->hashed();
+            $table->longText('avatar')->nullable();
+            $table->string('description')->nullable();
+            $table->enum('preferred_weight_unit', ['kg', 'lbs'])->default('kg');
+            $table->integer('weight')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
+        }
+        
     }
 
     public function down()
