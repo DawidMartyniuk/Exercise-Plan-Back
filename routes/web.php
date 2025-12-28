@@ -20,8 +20,6 @@ Route::get('/open-reset/{token}', function (string $token) {
     // deep link do apki
     $deepLink = "myapp://open-reset/{$token}?email=" . urlencode($email ?? '');
 
-    // jeśli na telefonie z apka – otworzy ją
-    // jeśli na desktopie – pokaże np. komunikat
     return redirect()->away($deepLink);
 })->name('password.open');
 
