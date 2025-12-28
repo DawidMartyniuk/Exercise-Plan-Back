@@ -1,66 +1,124 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Flex Plan — Backend
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Krótko: backend Laravel dla aplikacji frontendowej "Flex Plan" — REST API do zarządzania planami ćwiczeń, sesjami treningowymi i zasobami (obrazy/gify).
 
-## About Laravel
+## Najważniejsze
+- Framework: Laravel
+- API: JSON REST + Swagger (L5-Swagger)
+- Autoryzacja: JWT (tymon/jwt-auth)
+- Storage: lokalny disk `public` (storage/app/public → public/storage)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Funkcje
+- Zarządzanie planami treningowymi (exercise_table + exercise_rows_data + exercise_rows)
+- Tworzenie i aktualizacja sesji treningowych (training_sessions, training_exercises, training_sets)
+- Upload obrazów (storage/gifs)
+- Reset hasła (password_resets)
+- Dokumentacja API: /api/documentation lub /docs (L5-Swagger)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Wymagania
+- PHP 8.x
+- Composer
+- MySQL
+- Node/npm (opcjonalnie, frontend build)
+- Windows — polecenia poniżej przeznaczone dla PowerShell/CMD
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Quick start (Windows)
+1. Klon repo:
+   ```powershell
+   git clone <repo-url>
+   cd exercise_plan_back
+   ```
 
-## Learning Laravel
+2. Instalacja zależności:
+   ```powershell
+   composer install
+   ```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+3. Skopiuj plik środowiska i ustaw zmienne:
+   ```powershell
+   copy .env.example .env
+   ```
+   Ustaw DB_*, APP_URL (np. http://127.0.0.1:8000), JWT_SECRET (php artisan jwt:secret) i konfigurację mail.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+4. Wygeneruj klucz aplikacji:
+   ```powershell
+   php artisan key:generate
+   ```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+5. Migracje:
+   ```powershell
+   php artisan migrate
+   ```
 
-## Laravel Sponsors
+6. (Jeśli używasz storage public) utwórz link:
+   ```powershell
+   php artisan storage:link
+   ```
+   Uwaga: dla CORS lepiej serwować pliki przez trasę Laravel (/gifs/...) albo usunąć public/storage symlink aby Laravel obsługiwał żądania i dodał nagłówki CORS.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+7. Uruchom serwer deweloperski:
+   ```powershell
+ php artisan serve --host=0.0.0.0 --port=8000 
+   ```
 
-### Premium Partners
+Jeśli generator wyrzuca błędy (np. brakujące klasy),:
+- stwórz brakujące klasy (np. App\Mail\TestMail) lub
+- wyklucz foldery w config/l5-swagger.php → scanOptions → exclude
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+## Przykładowe requesty
+- Login:
+  POST /api/login
+  Body JSON: { "email":"...","password":"..." }
+
+- Pobierz plan:
+  GET /api/plan  (Authorization: Bearer <token>)
+
+- Upload obrazka w ExerciseController.create:
+  użyj form-data z kluczem `gif` (plik), backend zapisuje do storage/gifs i zwraca URL.
+
+## CORS / obrazy (ważne)
+- Jeśli frontend (np. Flutter Web) ładuje obrazki przez XHR, odpowiedź musi zawierać nagłówek Access-Control-Allow-Origin.
+- Najprostsze:
+  - Serwuj pliki przez trasę Laravel `/gifs/{filename}` i dodaj nagłówki CORS w response().
+  - LUB: skonfiguruj serwer (Apache/Nginx) aby ustawił nagłówki dla plików w public/storage.
+
+## Zmienne środowiskowe (przykład .env)
+APP_NAME=FlexPlan
+APP_ENV=local
+APP_KEY=base64:...
+APP_URL=http://127.0.0.1:8000
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=flexplan
+DB_USERNAME=root
+DB_PASSWORD=
+
+JWT_SECRET=...
+
+MAIL_MAILER=smtp
+MAIL_HOST=mailhog
+MAIL_PORT=1025
+MAIL_USERNAME=null
+MAIL_PASSWORD=null
+MAIL_FROM_ADDRESS="no-reply@flexplan.local"
+
+## Testy
+- Uruchom testy (jeśli dodane):
+  ```powershell
+  ./vendor/bin/phpunit
+  ```
 
 ## Contributing
+- Fork → feature branch → pull request
+- Utrzymuj migracje i aktualizuj dokumentację Swagger jeśli dodajesz endpointy
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## Troubleshooting (częste problemy)
+- Błędy migracji FK/indeksów: sprawdź strukturę tabel (DESCRIBE / SHOW CREATE TABLE) i popraw migracje dodając warunki Schema::hasColumn / checks.
+- L5-Swagger: jeśli generator zgłasza brak @OA\PathItem lub nieznane klasy — usuń/napraw adnotacje albo wyklucz katalogi z konfiguracji.
+- CORS: sprawdź czy nagłówek Access-Control-Allow-Origin znajduje się w odpowiedzi (dla XHR).
 
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## License & Contact
+- License: MIT
+- Kontakt: [dawidmartyniuk1@gmail.com]
