@@ -48,3 +48,7 @@ Route::get('/test-image', function () {
 
 
 Route::get('/api/documentation', [SwaggerController::class, 'api'])->name('l5swagger.default.api');
+
+
+Route::get('/docs', [SwaggerController::class, 'api']); // otwórz /docs
+// ...existing code...

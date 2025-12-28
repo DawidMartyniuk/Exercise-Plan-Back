@@ -28,5 +28,10 @@ class ExerciseRowsData extends Model
     {
         return $this->hasMany(ExerciseRows::class, 'row_data_id');
     }
+    public function row()
+{
+    return $this->belongsTo(ExerciseRows::class, 'row_data_id');
+}
+
 }
 

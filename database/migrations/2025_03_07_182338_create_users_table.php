@@ -14,8 +14,8 @@ class CreateUsersTable extends Migration
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
-            $table->string('password');
-            $table->longText('avatar')->nullable(); // dodaj pole dla awatara
+            $table->string('password')->hashed();
+            $table->longText('avatar')->nullable();
             $table->string('description')->nullable();
             $table->enum('preferred_weight_unit', ['kg', 'lbs'])->default('kg');
             $table->integer('weight')->nullable();

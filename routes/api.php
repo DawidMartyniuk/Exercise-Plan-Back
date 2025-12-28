@@ -9,7 +9,6 @@ use App\Http\Controllers\ExerciseController;
 use Illuminate\Support\Facades\Route;
 
 
-// Routy bez jwt.auth
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
@@ -20,7 +19,6 @@ Route::post('/reset-password', [ResetPasswordController::class, 'reset'])
     ->name('password.reset'); 
 
 
-// Routy z jwt.auth
 Route::middleware('jwt.auth')->group(function () {
     Route::get('/profile', [UsersController::class, 'getProfile']);
     Route::put('/profile', [UsersController::class, 'updateProfile']);
@@ -39,6 +37,7 @@ Route::middleware('jwt.auth')->group(function () {
 
     Route::get('/exercises', [ExerciseController::class, 'index']);
     Route::post('/exercises', [ExerciseController::class, 'create']);
+    
     //TODO: dorobić edytowanie i usuwanie ćwiczeń
 
     Route::post('/logout', [AuthController::class, 'logout']);

@@ -98,7 +98,9 @@ return [
              * @deprecated Please use `scanOptions.exclude`
              * `scanOptions.exclude` overwrites this
              */
-            'excludes' => [],
+            'excludes' => [
+                  base_path('app/Mail'),
+            ],
         ],
 
         'scanOptions' => [
@@ -156,7 +158,9 @@ return [
              * @note This option overwrites `paths.excludes`
              * @see \OpenApi\scan
              */
-            'exclude' => [],
+            'exclude' => [
+                 base_path('app/Mail'),
+            ],
 
             /*
              * Allows to generate specs either for OpenAPI 3.0.0 or OpenAPI 3.1.0.

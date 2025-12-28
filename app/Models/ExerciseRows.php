@@ -60,4 +60,9 @@ class ExerciseRows extends Model
     {
         return $this->colRepMax && $this->colRepMax !== $this->colRepMin;
     }
+    public function rowsData()
+{
+    return $this->hasMany(ExerciseRowsData::class, 'row_data_id');
+}
+
 }
